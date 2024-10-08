@@ -1,12 +1,10 @@
 const User = require("../Models/userModel");
 
 exports.Signup = async (req, res) => {
-  const newUser = await User.create(req.body);
+  await User.create(req.body);
   res.status(201).json({
     success: true,
-    data: {
-      user: newUser,
-    },
+    // data: newUser,
     message: "User created successfully",
   });
 };
@@ -19,11 +17,9 @@ exports.Login = async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-  res.status(201).json({
+  res.status(200).json({
     success: true,
     message: "User successfully Login",
-    data: {
-      user: user,
-    },
+    data: user,
   });
 };
