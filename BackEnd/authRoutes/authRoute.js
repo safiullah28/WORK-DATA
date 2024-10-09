@@ -11,6 +11,4 @@ authRouter.post("/createUser", signUp);
 
 authRouter.post("/getUser", logIn);
 
-// authRouter.get("/getAllUsers", verifyToken, getAllUsers);
-
 module.exports = authRouter;

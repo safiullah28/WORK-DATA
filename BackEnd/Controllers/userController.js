@@ -11,8 +11,12 @@ exports.signUp = async (req, res) => {
 };
 
 exports.logIn = async (req, res) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
     // Find the user by email
     const user = await User.findOne({ email }).lean();
     if (!user) {
@@ -44,7 +48,6 @@ exports.verifyToken = function (req, res, next) {
   if (testToken && testToken.startsWith("Bearer")) {
     token = testToken.split(" ")[1];
   }
-  // console.log("token :", token);
 
   if (!token) {
     return res.status(401).json({ error: "Access denied" });
@@ -67,7 +70,6 @@ exports.updateName = async (req, res) => {
       { name: req.body.name },
       { new: true }
     );
-    // console.log(id);
 
     if (!updateUser) {
       return res.status(404).json({ message: "User not found" });
@@ -77,7 +79,6 @@ exports.updateName = async (req, res) => {
       user: updateUser,
     });
   } catch (error) {
-    // Error handling
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
@@ -87,7 +88,6 @@ exports.deleteUser = async (req, res) => {
   try {
     const id = req.params.id;
     const deletedUser = await User.findByIdAndDelete(id);
-    // console.log(id);
 
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -96,23 +96,27 @@ exports.deleteUser = async (req, res) => {
       message: "User Deleted successfully",
     });
   } catch (error) {
-    // Error handling
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.getSingleUser = async (req, res) => {
-  const id = req.params.id;
-  const user = await User.findById(id).lean();
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id).lean();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const { password, ...others } = user;
+    res.status(200).json({
+      success: true,
+      data: others,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
-  const { password, ...others } = user;
-  res.status(200).json({
-    success: true,
-    data: others,
-  });
 };
 
 exports.getAllUsers = async (req, res) => {
