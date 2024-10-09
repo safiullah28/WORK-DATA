@@ -44,7 +44,7 @@ exports.verifyToken = function (req, res, next) {
   if (testToken && testToken.startsWith("Bearer")) {
     token = testToken.split(" ")[1];
   }
-  console.log("token :", token);
+  // console.log("token :", token);
 
   if (!token) {
     return res.status(401).json({ error: "Access denied" });
@@ -59,12 +59,72 @@ exports.verifyToken = function (req, res, next) {
   }
 };
 
+exports.updateName = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updateUser = await User.findByIdAndUpdate(
+      { _id: id },
+      { name: req.body.name },
+      { new: true }
+    );
+    // console.log(id);
+
+    if (!updateUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      message: "Username updated successfully",
+      user: updateUser,
+    });
+  } catch (error) {
+    // Error handling
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deletedUser = await User.findByIdAndDelete(id);
+    // console.log(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      message: "User Deleted successfully",
+    });
+  } catch (error) {
+    // Error handling
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getSingleUser = async (req, res) => {
+  const id = req.params.id;
+  const user = await User.findById(id).lean();
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const { password, ...others } = user;
+  res.status(200).json({
+    success: true,
+    data: others,
+  });
+};
+
 exports.getAllUsers = async (req, res) => {
   const limitValue = req.query.limit || 2;
   const skipValue = req.query.skip || 0;
-  const users = await User.find().limit(limitValue).skip(skipValue);
+  const users = await User.find().limit(limitValue).skip(skipValue).lean();
+  const sanitizedUsers = users.map((user) => {
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword; // Return the user object without the password
+  });
   res.status(200).json({
     success: true,
-    data: users,
+    data: sanitizedUsers,
   });
 };
