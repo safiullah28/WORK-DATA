@@ -63,7 +63,6 @@ exports.updateName = async (req, res) => {
       user: updateUser,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -80,7 +79,6 @@ exports.deleteUser = async (req, res) => {
       message: "User Deleted successfully",
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -98,7 +96,6 @@ exports.getSingleUser = async (req, res) => {
       data: others,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -117,7 +114,6 @@ exports.getAllUsers = async (req, res) => {
       data: sanitizedUsers,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
