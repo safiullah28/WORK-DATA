@@ -120,15 +120,20 @@ exports.getSingleUser = async (req, res) => {
 };
 
 exports.getAllUsers = async (req, res) => {
-  const limitValue = req.query.limit || 2;
-  const skipValue = req.query.skip || 0;
-  const users = await User.find().limit(limitValue).skip(skipValue).lean();
-  const sanitizedUsers = users.map((user) => {
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword; // Return the user object without the password
-  });
-  res.status(200).json({
-    success: true,
-    data: sanitizedUsers,
-  });
+  try {
+    const limitValue = req.query.limit || 2;
+    const skipValue = req.query.skip || 0;
+    const users = await User.find().limit(limitValue).skip(skipValue).lean();
+    const sanitizedUsers = users.map((user) => {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword; // Return the user object without the password
+    });
+    res.status(200).json({
+      success: true,
+      data: sanitizedUsers,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
