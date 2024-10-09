@@ -3,11 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.signUp = async (req, res) => {
-  await User.create(req.body);
-  res.status(201).json({
-    success: true,
-    message: "User created successfully",
-  });
+  try {
+    await User.create(req.body);
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ error, message: "Error in creating user" });
+  }
 };
 
 exports.logIn = async (req, res) => {
@@ -39,26 +43,6 @@ exports.logIn = async (req, res) => {
     res.status(200).json({ access_token: token, others });
   } catch (error) {
     res.status(400).json({ error: "Login failed" });
-  }
-};
-
-exports.verifyToken = function (req, res, next) {
-  let testToken = req.header("Authorization");
-  let token;
-  if (testToken && testToken.startsWith("Bearer")) {
-    token = testToken.split(" ")[1];
-  }
-
-  if (!token) {
-    return res.status(401).json({ error: "Access denied" });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.data = decoded.data;
-    next();
-  } catch (error) {
-    console.log("error", error);
-    res.status(401).json({ error: "Invalid token" });
   }
 };
 
