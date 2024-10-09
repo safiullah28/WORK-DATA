@@ -102,8 +102,21 @@ exports.getSingleUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const limitValue = req.query.limit || 2;
-    const skipValue = req.query.skip || 0;
+    const limitValue = parseInt(req.query.limit, 10) || 2;
+    const skipValue = parseInt(req.query.skip, 10) || 0;
+
+    // Validate limit and skip
+    if (isNaN(limitValue) || limitValue < 0) {
+      return res
+        .status(400)
+        .json({ error: "Limit must be a non-negative number" });
+    }
+    if (isNaN(skipValue) || skipValue < 0) {
+      return res
+        .status(400)
+        .json({ error: "Skip must be a non-negative number" });
+    }
+
     const users = await User.find().limit(limitValue).skip(skipValue).lean();
     const sanitizedUsers = users.map((user) => {
       const { password, ...userWithoutPassword } = user;
