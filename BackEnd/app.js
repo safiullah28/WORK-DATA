@@ -4,7 +4,8 @@ const dotenv = require("dotenv");
 const authRouter = require("./authRoutes/authRoute");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const userRouter = require("./userRoute.js/userRoute");
+const userRouter = require("./userRoute/userRoute");
+const roleRouter = require("./roleRoute/roleRoute");
 dotenv.config();
 
 const app = express();
@@ -16,9 +17,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use("/api", authRouter);
+app.use("/api", roleRouter);
 app.use("/api", userRouter);
-
-// Middleware to verify JWT token
 
 mongoose.set("strictQuery", false);
 mongoose
